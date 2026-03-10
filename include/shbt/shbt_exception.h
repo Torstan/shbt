@@ -1,6 +1,11 @@
+#pragma once
+
+#include <exception>
+
 #include "shbt/shbt.h"
 
 namespace shbt {
+
 class Exception : public std::exception {
 public:
   Exception() {
