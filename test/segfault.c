@@ -13,14 +13,20 @@
  * limitations under the License.
  */
 
+#include <stdio.h>
 #include <stdlib.h>
+
 #include "shbt/shbt.h"
 
 // Trigger a segmentation fault.
 
-int main() {
-  shbt_register_fatal_handlers();
+void test() {
   volatile int* x = NULL;
   *x;
+  printf("%d\n", *x);
+}
+int main() {
+  shbt_register_fatal_handlers();
+  test();
   return 0;
 }
