@@ -26,7 +26,11 @@ extern "C" {
 
 typedef void (*print_func_t)(const char*);
 
+/**
+ * Save backtrace in thread local storage
+ */
 void shbt_save_backtrace();
+
 /**
  * Print a collected backtrace using a print function.
  *
@@ -35,6 +39,13 @@ void shbt_save_backtrace();
  * @param print_func Function to use for printing.
  */
 bool shbt_print_saved_backtrace(print_func_t print_func);
+
+/**
+ * Print backtrace of current calling point
+ *
+ * @param print_func Function to use for printing.
+ *
+ */
 void shbt_print_backtrace(print_func_t print_func);
 
 /** Exit action for signal handlers. */
