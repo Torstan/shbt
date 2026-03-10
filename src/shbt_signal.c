@@ -573,7 +573,7 @@ void shbt_sigaction_handler(int sig_num, siginfo_t* info, void* void_ucontext) {
   }
   shbt_print_signal(sig_num, info);
   shbt_print_to_stderr("Backtrace:\n");
-  shbt_print_backtrace_fd(STDERR_FILENO);
+  shbt_print_backtrace(shbt_print_to_stderr);
   if (sig_info->callback != NULL) {
     sig_info->callback(sig_num);
   }
@@ -747,15 +747,6 @@ bool shbt_register_fatal_handlers() {
   return shbt_register_signal_handlers(
     sig_nums, (sizeof(sig_nums) / sizeof(int)) - 1,  // Ignore last 0.
     SHBT_EXIT_ACTION_EXIT, NULL);
-}
-
-bool shbt_register_signal_callback(int sig_num, void (*callback)(int)) {
-  struct shbt_signal_info* sig_info = shbt_get_signal_info(sig_num);
-  if (sig_info == NULL) {
-    return false;
-  }
-  sig_info->callback = callback;
-  return true;
 }
 
 bool shbt_register_signal_exit_action(int sig_num,

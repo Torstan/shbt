@@ -24,74 +24,18 @@
 extern "C" {
 #endif
 
-/** Saves collected stack frame information. */
-typedef struct shbt_frame {
-  /** Address for the function (PC). */
-  void* addr;
-  /** Saved symbol name (not demangled). */
-  char symbol[1024];
-} shbt_frame_t;
+typedef void (*print_func_t)(const char*);
 
+void shbt_save_backtrace();
 /**
- * Collect a backtrace.
- *
- * This writes at most num_frames to trace.
+ * Print a collected backtrace using a print function.
  *
  * This function is safe to call from a signal handler and is thread-safe.
  *
- * @param trace Pre-allocated array to store frame info in.
- * @param num_frames Maximum number of frames to write to trace.
- * @param num_valid_frames Will contain the number of valid frames written to
- * trace.
+ * @param print_func Function to use for printing.
  */
-bool shbt_collect_backtrace(shbt_frame_t trace[], size_t num_frames,
-                            size_t* num_valid_frames);
-/**
- * Print a collected backtrace to a file descriptor.
- *
- * This function is safe to call from a signal handler and is thread-safe.
- *
- * @param trace Collected stack trace.
- * @param num_frames Number of frames in trace.
- * @param fd The file descriptor to write to.
- */
-bool shbt_print_collected_backtrace_fd(shbt_frame_t trace[], size_t num_frames,
-                                       int fd);
-/**
- * Write a backtrace from the current frame to a file descriptor.
- *
- * This is essentially shbt_collect_backtrace followed by
- * shbt_print_collected_backtrace_fd.
- *
- * This function is safe to call from a signal handler and is thread-safe.
- *
- * @param fd The file descriptor to write to.
- */
-bool shbt_print_backtrace_fd(int fd);
-
-/**
- * Write a backtrace with source file and line number information.
- *
- * This uses addr2line to resolve addresses to file:line. It is NOT safe to
- * call from a signal handler, but is useful for exception handling and
- * diagnostic contexts.
- *
- * Requires the binary to be compiled with debug info (-g).
- *
- * @param fd The file descriptor to write to.
- */
-bool shbt_print_backtrace_detailed_fd(int fd);
-
-/**
- * Return the current depth of the stack frame.
- *
- * This depth includes the call to this function. If you allocate at least
- * this many shbt_frame_t entries, it should be sufficient to collect a
- * complete backtrace with shbt_collect_backtrace.
- *
- * This function is safe to call from a signal handler and is thread-safe.
- */
-size_t shbt_get_stack_depth();
+bool shbt_print_saved_backtrace(print_func_t print_func);
+void shbt_print_backtrace(print_func_t print_func);
 
 /** Exit action for signal handlers. */
 typedef enum shbt_exit_action {
@@ -107,7 +51,6 @@ typedef enum shbt_exit_action {
  *
  * This signal handler will automatically print signal information and a
  * backtrace to stderr. It can also invoke an optional callback after this
- * (see shbt_register_signal_callback).
  *
  * It can then take one of three actions:
  *   1. Exit the program (default).
@@ -158,21 +101,7 @@ bool shbt_register_signal_handlers(const int sig_nums[], size_t num_sigs,
  * These are the signals that either terminate or dump core when received.
  */
 bool shbt_register_fatal_handlers();
-/**
- * Register a callback for a signal.
- *
- * The signal handler will invoke the callback after printing a backtrace.
- * The callback must be safe to call from a signal handler.
- *
- * If any existing callback is registered, it will be replaced.
- *
- * Note that you must be careful with this, since a signal handler may
- * already be established.
- *
- * @param sig_num The signal number.
- * @param callback Function pointer to the callback to invoke.
- */
-bool shbt_register_signal_callback(int sig_num, void (*callback)(int));
+
 /**
  * Set the exit action for a signal.
  *
@@ -188,3 +117,4 @@ bool shbt_register_signal_exit_action(int sig_num,
 #ifdef __cplusplus
 }  // extern "C"
 #endif
+

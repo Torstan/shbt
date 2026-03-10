@@ -152,6 +152,41 @@ bool shbt_demangle(const char* mangled, char* out, size_t out_size);
  */
 void __attribute__((destructor)) shbt_cleanup();
 
+/** Saves collected stack frame information. */
+typedef struct shbt_frame {
+  /** Address for the function (PC). */
+  size_t addr;
+  size_t offset;
+  /** Saved symbol name (not demangled). */
+  char symbol[1024];
+} shbt_frame_t;
+
+/**
+ * Collect a backtrace.
+ *
+ * This writes at most num_frames to trace.
+ *
+ * This function is safe to call from a signal handler and is thread-safe.
+ *
+ * @param trace Pre-allocated array to store frame info in.
+ * @param num_frames Maximum number of frames to write to trace.
+ * @param num_valid_frames Will contain the number of valid frames written to
+ * trace.
+ */
+bool shbt_collect_backtrace_frames(shbt_frame_t trace[], size_t num_frames,
+                                   size_t* num_valid_frames);
+
+/**
+ * Return the current depth of the stack frame.
+ *
+ * This depth includes the call to this function. If you allocate at least
+ * this many shbt_frame_t entries, it should be sufficient to collect a
+ * complete backtrace with shbt_save_backtrace.
+ *
+ * This function is safe to call from a signal handler and is thread-safe.
+ */
+size_t shbt_get_stack_depth();
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif
