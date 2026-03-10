@@ -59,7 +59,7 @@ bool shbt_collect_backtrace_frames(shbt_frame_t trace[], size_t num_frames,
   return true;
 }
 
-bool shbt_print_saved_backtrace(print_func_t print_func) {
+void shbt_print_saved_backtrace(print_func_t print_func) {
   shbt_frame_t *trace = tls_trace;
   size_t num_frames = tls_num_valid_frames;
   char str_buf[128];  // Should be sufficiently large.
@@ -80,13 +80,12 @@ bool shbt_print_saved_backtrace(print_func_t print_func) {
     print_func(": ");
     if (shbt_demangle(trace[cur_frame].symbol, demangled_symbol,
                       sizeof(demangled_symbol))) {
-      snprintf(bt_buf, sizeof(bt_buf), "0x%016lx <%s+0x%lx>\n", trace[cur_frame].addr, demangled_symbol, trace[cur_frame].offset);
+      snprintf(bt_buf, sizeof(bt_buf), "0x%016zx <%s+0x%zx>\n", trace[cur_frame].addr, demangled_symbol, trace[cur_frame].offset);
     } else {
-      snprintf(bt_buf, sizeof(bt_buf), "0x%016lx <%s+0x%lx>\n", trace[cur_frame].addr, trace[cur_frame].symbol, trace[cur_frame].offset);
+      snprintf(bt_buf, sizeof(bt_buf), "0x%016zx <%s+0x%zx>\n", trace[cur_frame].addr, trace[cur_frame].symbol, trace[cur_frame].offset);
     }
     print_func(bt_buf);
   }
-  return true;
 }
 
 void shbt_save_backtrace() {
