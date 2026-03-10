@@ -1,5 +1,3 @@
-#include <unistd.h>
-
 #include <exception>
 #include <iostream>
 
@@ -8,7 +6,7 @@
 struct MyException : public shbt::Exception {
   MyException() { }
 
-  virtual const char* what() const noexcept { return "MyException"; }
+  const char* what() const noexcept override { return "MyException"; }
 };
 
 void test() { throw MyException(); }

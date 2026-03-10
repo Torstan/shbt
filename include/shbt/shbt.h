@@ -38,7 +38,7 @@ void shbt_save_backtrace();
  *
  * @param print_func Function to use for printing.
  */
-bool shbt_print_saved_backtrace(print_func_t print_func);
+void shbt_print_saved_backtrace(print_func_t print_func);
 
 /**
  * Print backtrace of current calling point
