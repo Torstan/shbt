@@ -3,10 +3,10 @@
 #include <exception>
 #include <iostream>
 
-#include "shbt/shbt.h"
+#include "shbt/shbt_exception.h"
 
-struct MyException : public std::exception {
-  MyException() { std::cout << "Construct MyException" << std::endl; }
+struct MyException : public shbt::Exception {
+  MyException() { }
 
   virtual const char* what() const noexcept { return "MyException"; }
 };
@@ -18,6 +18,8 @@ int main() {
     test();
   } catch (std::exception& e) {
     std::cout << "exception Info:" << e.what() << std::endl;
-    shbt_print_backtrace_detailed_fd(STDERR_FILENO);
+    shbt_print_saved_backtrace([](const char* str){
+        std::cout << str;
+    });
   }
 }

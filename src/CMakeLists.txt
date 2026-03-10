@@ -1,6 +1,6 @@
 set_full_path(THIS_DIR_SOURCES
   shbt_signal.c
-  shbt_backtrace.c
+  shbt_backtrace.cpp
   shbt_utils.c
   demangle_ia64.c
   demangle_abi.cpp
