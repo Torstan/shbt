@@ -631,15 +631,18 @@ bool shbt_register_signal_handler(int sig_num, shbt_exit_action_t exit_action,
   }
 #endif
   sig_info->callback = callback;
-  // Set up the signal handler stack if needed.
+// Set up the signal handler stack if needed.
+// Use a larger stack than SIGSTKSZ (8KB) because libunwind needs significant
+// stack space for unw_context_t, unw_cursor_t, and unwinding operations.
+#define SHBT_SIGNAL_STACK_SIZE (64 * 1024)
   if (signal_handler_stack == NULL) {
-    signal_handler_stack = malloc(SIGSTKSZ);
+    signal_handler_stack = malloc(SHBT_SIGNAL_STACK_SIZE);
     if (signal_handler_stack == NULL) {
       return false;
     }
     stack_t ss;
     ss.ss_sp = signal_handler_stack;
-    ss.ss_size = SIGSTKSZ;
+    ss.ss_size = SHBT_SIGNAL_STACK_SIZE;
     ss.ss_flags = 0;
     if (sigaltstack(&ss, NULL) < 0) {
       return false;

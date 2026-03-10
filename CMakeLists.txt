@@ -64,7 +64,7 @@ target_include_directories(shbt PUBLIC
   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}>)
 
-target_link_libraries(shbt PUBLIC LIBUNWIND::libunwind)
+target_link_libraries(shbt PUBLIC LIBUNWIND::libunwind ${CMAKE_DL_LIBS})
 
 if (SHBT_HAVE_MPI)
   target_link_libraries(shbt PUBLIC MPI::MPI_C)

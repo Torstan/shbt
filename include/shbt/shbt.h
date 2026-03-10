@@ -15,9 +15,10 @@
 
 #pragma once
 
-#include "shbt_config.h"
-
 #include <stdbool.h>
+#include <stddef.h>
+
+#include "shbt_config.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -67,6 +68,19 @@ bool shbt_print_collected_backtrace_fd(shbt_frame_t trace[], size_t num_frames,
  * @param fd The file descriptor to write to.
  */
 bool shbt_print_backtrace_fd(int fd);
+
+/**
+ * Write a backtrace with source file and line number information.
+ *
+ * This uses addr2line to resolve addresses to file:line. It is NOT safe to
+ * call from a signal handler, but is useful for exception handling and
+ * diagnostic contexts.
+ *
+ * Requires the binary to be compiled with debug info (-g).
+ *
+ * @param fd The file descriptor to write to.
+ */
+bool shbt_print_backtrace_detailed_fd(int fd);
 
 /**
  * Return the current depth of the stack frame.
