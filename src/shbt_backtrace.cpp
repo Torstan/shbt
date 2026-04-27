@@ -15,7 +15,6 @@
 
 #define _XOPEN_SOURCE 500
 #include <dlfcn.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -64,7 +63,6 @@ void shbt_print_saved_backtrace(print_func_t print_func) {
   size_t num_frames = tls_num_valid_frames;
   char str_buf[128];  // Should be sufficiently large.
   char demangled_symbol[512];
-  char bt_buf[1024];
 
   for (size_t cur_frame = 0; cur_frame < num_frames; ++cur_frame) {
     // Print frame number, with manual padding.
@@ -77,14 +75,20 @@ void shbt_print_saved_backtrace(print_func_t print_func) {
     }
     shbt_itoa(cur_frame, str_buf, sizeof(str_buf), 10, 0);
     print_func(str_buf);
-    print_func(": ");
+    print_func(": 0x");
+    shbt_itoa(trace[cur_frame].addr, str_buf, sizeof(str_buf), 16, 16);
+    print_func(str_buf);
+    print_func(" <");
     if (shbt_demangle(trace[cur_frame].symbol, demangled_symbol,
                       sizeof(demangled_symbol))) {
-      snprintf(bt_buf, sizeof(bt_buf), "0x%016zx <%s+0x%zx>\n", trace[cur_frame].addr, demangled_symbol, trace[cur_frame].offset);
+      print_func(demangled_symbol);
     } else {
-      snprintf(bt_buf, sizeof(bt_buf), "0x%016zx <%s+0x%zx>\n", trace[cur_frame].addr, trace[cur_frame].symbol, trace[cur_frame].offset);
+      print_func(trace[cur_frame].symbol);
     }
-    print_func(bt_buf);
+    print_func("+0x");
+    shbt_itoa(trace[cur_frame].offset, str_buf, sizeof(str_buf), 16, 0);
+    print_func(str_buf);
+    print_func(">\n");
   }
 }
 

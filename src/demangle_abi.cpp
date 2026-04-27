@@ -45,14 +45,15 @@ bool shbt_demangle(const char* mangled, char* out, size_t out_size) {
     }
     return false;
   }
-  if (abi_out_size > out_size) {
+  size_t demangled_size = strlen(abi_out) + 1;
+  if (demangled_size > out_size) {
     if (abi_out != NULL) {
       free(abi_out);
     }
     out[0] = '\0';
     return false;
   }
-  strncpy(out, abi_out, abi_out_size);
+  memcpy(out, abi_out, demangled_size);
   free(abi_out);
   return true;
 }

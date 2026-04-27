@@ -21,17 +21,27 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 
 #include "shbt/shbt.h"
 #include "shbt/shbt_internal.h"
 
 void shbt_safe_print(const char* output, int fd) {
-  ssize_t r;
-  do {
-    r = write(fd, output, strlen(output));
-  } while (r == -1 && errno == EINTR);
+  const char* end = output;
+  while (*end != '\0') {
+    ++end;
+  }
+
+  while (output < end) {
+    ssize_t r = write(fd, output, (size_t) (end - output));
+    if (r > 0) {
+      output += r;
+    } else if (r == -1 && errno == EINTR) {
+      continue;
+    } else {
+      break;
+    }
+  }
 }
 
 void shbt_print_to_stderr(const char* output) {

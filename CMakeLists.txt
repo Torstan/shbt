@@ -23,6 +23,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -g -Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 
 include(GNUInstallDirs)
+include(CTest)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
@@ -53,7 +54,10 @@ configure_file(
 include(SHBTCMakeUtilities)
 add_subdirectory(include)
 add_subdirectory(src)
-add_subdirectory(test)
+
+if (BUILD_TESTING)
+  add_subdirectory(test)
+endif ()
 
 add_library(shbt SHARED ${SHBT_SOURCES} ${SHBT_HEADERS})
 set_target_properties(shbt PROPERTIES VERSION ${SHBT_VERSION})
